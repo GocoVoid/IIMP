@@ -20,8 +20,8 @@ import { refreshAccessToken } from './authService';
 
 //const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://192.168.0.213:1111/api';
 //const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:1111/api';
-//const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://15.207.107.121:1111/api';
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://15.207.107.121:1111/api';
+//const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 /* ── Track in-flight refresh to avoid duplicate calls ─────── */
 let isRefreshing       = false;
