@@ -94,12 +94,12 @@ const MyTicketsList = ({ onCreateClick }) => {
     <>
       <div className="space-y-5 animate-fade-in">
 
-        <div className="flex items-center justify-between flex-wrap gap-3">
+        {/* <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">My Tickets</h2>
             <p className="text-sm text-gray-500 mt-0.5">All tickets you have personally created.</p>
           </div>
-        </div>
+        </div> */}
 
         {loading ? <LoadingState /> : (
           <>
