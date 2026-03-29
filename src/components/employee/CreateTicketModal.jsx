@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Modal from '../shared/Modal';
 import { DEPARTMENTS_MAP, DEPARTMENT_NAMES, PRIORITIES } from '../../data/mockData';
+import { getPriority } from '../../services/incidentService';
 
 const INITIAL = { title: '', department: '', category: '', priority: 'Medium', description: '' };
 
