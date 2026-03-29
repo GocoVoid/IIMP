@@ -74,6 +74,8 @@ const CreateTicketModal = ({ isOpen, onClose, onSubmit }) => {
     setLoading(true);
     console.log(form);
     try {
+      form.priority = await getPriority(form.description);
+      console.log(form);
       await onSubmit({ ...form, attachments: files });
       setForm(INITIAL); setFiles([]); setErrors({});
       onClose();
