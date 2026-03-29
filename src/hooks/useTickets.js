@@ -23,7 +23,7 @@ export const useTickets = (_currentUserId, _role) => {
     category:   typeof t.category === 'string' ? t.category   : t.category?.categoryName  ?? '',
     categoryId: typeof t.category === 'string' ? null         : t.category?.id            ?? t.categoryId ?? null,
     department: typeof t.category === 'string' ? t.department : t.category?.departmentName ?? null,
-    priority: ({ HIGH: 'High', MEDIUM: 'Medium', LOW: 'Low', CRITICAL: 'Critical' })[t.priority] ?? t.priority ?? '',
+    priority:        ({"LOW":"Low","MEDIUM":"Medium","HIGH":"High","CRITICAL":"Critical"})[t.priority] ?? t.priority ?? '',
     status:          ({"OPEN":"Open","CLOSED":"Closed","RESOLVED":"Resolved","IN_PROGRESS":"In Progress"})[t.status] ?? t.status,
     createdBy:       t.createdBy,
     createdByName:   t.createdByName  ?? t.createdBy?.name  ?? null,
@@ -60,8 +60,6 @@ export const useTickets = (_currentUserId, _role) => {
       const list = (ticketRes?.content ?? ticketRes ?? []).map(normalise);
       setTickets(list);
       const statsRes = await api.getIncidentStats();
-      console.log("Here");
-      console.log(statsRes);
       setStats({
         total:      statsRes.totalAll ?? 0,
         open:       statsRes.open ?? 0,
@@ -90,7 +88,6 @@ export const useTickets = (_currentUserId, _role) => {
 
     const list = (ticketRes?.content ?? ticketRes ?? []).map(normalise);
     setTickets(list);
-    console.log(statsRes);
     setStats({
       total:      statsRes.total      ?? statsRes.totalAll ?? list.length,
        open:       statsRes.open ?? 0,
@@ -123,10 +120,10 @@ export const useTickets = (_currentUserId, _role) => {
   ══════════════════════════════════════════════════════════ */
 
   const createTicket = useCallback(async (data) => {
-    const res = await api.createIncident({
+    const res = api.createIncident({
       title:       data.title,
       description: data.description,
-      priority:    data.priority,
+      priority:    data.priority.toUpperCase(),
       category:    data.category,
     });
     const newTicket = normalise(res);
@@ -167,10 +164,7 @@ export const useTickets = (_currentUserId, _role) => {
   }, []);
 
   const addComment = useCallback(async (incidentKey, text, _authorName, internal) => {
-    const res = await api.addComment(incidentKey, text, internal);
-    console.log(internal);
-    console.log(res);
-    console.log("Reached here in useTickets");
+    const res = await api.addComment(incidentKey, text, internal)
     const newComment = {
       id:         res.id,
       author:     res.user?.name ?? _authorName ?? 'You',
@@ -178,7 +172,6 @@ export const useTickets = (_currentUserId, _role) => {
       isInternal: res.isInternal ?? res.internal,
       createdAt:  res.createdAt,
     };
-    console.log("New Comment :\n"+newComment);
     setTickets(prev => prev.map(t =>
       t.id === incidentKey
         ? { ...t, comments: [...t.comments, newComment], updatedAt: new Date().toISOString() }

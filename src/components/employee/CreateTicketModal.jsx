@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Modal from '../shared/Modal';
 import { DEPARTMENTS_MAP, DEPARTMENT_NAMES, PRIORITIES } from '../../data/mockData';
-import { getPriority } from '../../services/incidentService';
+import { createIncident, getPriority } from '../../services/incidentService';
 
 const INITIAL = { title: '', department: '', category: '', priority: '', description: '' };
 
@@ -41,7 +41,6 @@ const CreateTicketModal = ({ isOpen, onClose, onSubmit }) => {
     if (form.title.length > 150)                      e.title       = 'Title must be under 150 characters.';
     if (!form.department)                             e.department  = 'Please select a department.';
     if (!form.category)                               e.category    = 'Please select a category.';
-    if (!form.priority)                               e.priority    = 'Please select a priority.';
     if (form.description.trim().length < 20)          e.description = 'Description must be at least 20 characters.';
     return e;
   };
@@ -73,19 +72,31 @@ const CreateTicketModal = ({ isOpen, onClose, onSubmit }) => {
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setLoading(true);
-    console.log(form);
     try {
-      const response = await fetch("https://iimp-backend.duckdns.org/predict", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ description: form.description }),
+      let text = `Analyse the incident description attached and strictly respond only in single word about the priority of the incident (Low, Medium, High, Critical) => Description : ${form.description}`;
+  
+      const data = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer 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",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "model": "nvidia/nemotron-3-super-120b-a12b:free",
+          "messages": [{ "role": "user", "content": text }]
+        })
       });
-      console.log(response);
-      const result = await response.json();
-      form.priority = result.priority;
-      console.log(form);
-      await onSubmit({ ...form, attachments: files });
-      setForm(INITIAL); setFiles([]); setErrors({});
+  
+      const response = await data.json();                          // ✅ await the json()
+      const fetchedPriority = response.choices[0].message.content.trim(); // ✅ no .then()
+      console.log(fetchedPriority);
+  
+      const finalForm = { ...form, priority: fetchedPriority };
+      console.log(finalForm);
+      createIncident({ ...finalForm, attachments: files });        // ✅ runs after priority is ready
+      setForm({ title: '', department: '', category: '', priority: '', description: '' });
+      setFiles([]);
+      setErrors({});
       onClose();
     } catch {
       /* keep modal open on error so user can retry */
