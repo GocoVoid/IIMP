@@ -75,7 +75,13 @@ const CreateTicketModal = ({ isOpen, onClose, onSubmit }) => {
     setLoading(true);
     console.log(form);
     try {
-      form.priority = await getPriority(form.description);
+      const response = await fetch("https://iimp-backend.duckdns.org/predict", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: form.description }),
+      });
+      const result = await response.json();
+      form.priority = result.priority;
       console.log(form);
       await onSubmit({ ...form, attachments: files });
       setForm(INITIAL); setFiles([]); setErrors({});
