@@ -94,7 +94,6 @@ const MyTicketsList = ({ onCreateClick }) => {
     <>
       <div className="space-y-5 animate-fade-in">
 
-        {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">My Tickets</h2>
