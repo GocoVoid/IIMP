@@ -236,7 +236,7 @@ const ActionsPanel = ({ ticket, role, user, onUpdateStatus, onAssign, onAddComme
 
   const selCls = 'flex-1 px-3 py-2 text-xs rounded-xl border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none bg-white';
 
-  if (role === 'EMPLOYEE') return null;
+  //if (role === 'EMPLOYEE') return null;
 
   return (
     <div className="space-y-4 pt-4" style={{ borderTop: '1px solid #f3f4f6' }}>

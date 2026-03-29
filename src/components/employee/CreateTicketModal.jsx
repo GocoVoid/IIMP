@@ -78,7 +78,7 @@ const CreateTicketModal = ({ isOpen, onClose, onSubmit }) => {
       const data = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
-          "Authorization": "Bearer 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",
+          "Authorization": `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
