@@ -32,6 +32,37 @@ const ErrorState = ({ message, onRetry }) => (
   </div>
 );
 
+/* ── Pagination ─────────────────────────────────────────── */
+const Pagination = ({ page, totalPages, onPageChange }) => {
+  if (totalPages <= 1) return null;
+  const set = new Set([0, page - 1, page, page + 1, totalPages - 1]);
+  const pages = [...set].filter(p => p >= 0 && p < totalPages).sort((a, b) => a - b);
+  const btnCls = 'min-w-[28px] h-7 px-2 rounded-lg text-xs font-medium transition-colors';
+  return (
+    <div className="flex items-center gap-1">
+      <button onClick={() => onPageChange(page - 1)} disabled={page === 0}
+        className={`${btnCls} disabled:opacity-30`}
+        style={{ background:'#fff', color:'#6b7280', border:'1px solid #d1d5db' }}>‹</button>
+      {pages.map((p, i) => (
+        <React.Fragment key={p}>
+          {i > 0 && p - pages[i - 1] > 1 && <span className="text-xs text-gray-400 px-1">…</span>}
+          <button onClick={() => onPageChange(p)} className={btnCls}
+            style={p === page
+              ? { background:'#3c3c8c', color:'#fff', border:'1px solid #3c3c8c' }
+              : { background:'#fff', color:'#6b7280', border:'1px solid #d1d5db' }}>
+            {p + 1}
+          </button>
+        </React.Fragment>
+      ))}
+      <button onClick={() => onPageChange(page + 1)} disabled={page >= totalPages - 1}
+        className={`${btnCls} disabled:opacity-30`}
+        style={{ background:'#fff', color:'#6b7280', border:'1px solid #d1d5db' }}>›</button>
+    </div>
+  );
+};
+
+const PAGE_SIZE = 10;
+
 /* ── Main Component ──────────────────────────────────────── */
 export const StaffMyTickets = () => {
   const { user } = useAuthContext();
@@ -53,6 +84,8 @@ export const StaffMyTickets = () => {
   const [status,   setStatus]   = useState('');
   const [priority, setPriority] = useState('');
 
+  const [page,     setPage]     = useState(0);
+
   /* Filter to tickets created by this staff member */
   const myTickets = allTickets.filter(t => {
     const matchesOwner = t.createdByName === user?.fullName;
@@ -63,6 +96,12 @@ export const StaffMyTickets = () => {
                       || t.id.toLowerCase().includes(search.toLowerCase());
     return matchesOwner && matchesSt && matchesPr && matchesSe;
   });
+
+  useEffect(() => { setPage(0); }, [search, status, priority]);
+
+  const totalPages = Math.max(1, Math.ceil(myTickets.length / PAGE_SIZE));
+  const safePage   = Math.min(page, totalPages - 1);
+  const pagedTickets = myTickets.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
 
   const formatDate = iso => new Date(iso).toLocaleDateString('en-IN', {
     day: '2-digit', month: 'short', year: 'numeric',
@@ -75,6 +114,7 @@ export const StaffMyTickets = () => {
     open:       myTickets.filter(t => t.status === 'Open').length,
     inProgress: myTickets.filter(t => t.status === 'In Progress').length,
     resolved:   myTickets.filter(t => t.status === 'Resolved').length,
+    closed:     myTickets.filter(t => t.status === 'Closed').length,
   };
 
   const statCards = [
@@ -82,6 +122,7 @@ export const StaffMyTickets = () => {
     { label: 'Open',        value: myStats.open,        color: 'from-cyan-500 to-cyan-600'     },
     { label: 'In Progress', value: myStats.inProgress,  color: 'from-amber-500 to-amber-600'   },
     { label: 'Resolved',    value: myStats.resolved,    color: 'from-green-500 to-green-600'   },
+    { label: 'Closed',      value: myStats.closed,      color: 'from-gray-500 to-gray-600'     },
   ];
 
   return (
@@ -110,7 +151,7 @@ export const StaffMyTickets = () => {
         {loading ? <LoadingState /> : error ? <ErrorState message={error} onRetry={fetchAll} /> : (
           <>
             {/* Stat Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
               {statCards.map(c => (
                 <div key={c.label}
                   className={`rounded-2xl p-4 text-white bg-gradient-to-br ${c.color} shadow-pratiti-md`}>
@@ -166,7 +207,7 @@ export const StaffMyTickets = () => {
                 <table className="w-full text-xs">
                   <thead>
                     <tr style={{ background: '#f9fafb', borderBottom: '1px solid #f3f4f6' }}>
-                      {['Ticket ID', 'Title', 'Category', 'Department', 'Priority', 'Status', 'Assigned To', 'Created', ''].map(h => (
+                      {['Ticket ID', 'Title', 'Category', 'Priority', 'Status', 'Assigned To', 'Created', ''].map(h => (
                         <th key={h} className="text-left px-4 py-3 text-gray-500 font-medium">{h}</th>
                       ))}
                     </tr>
@@ -174,7 +215,7 @@ export const StaffMyTickets = () => {
                   <tbody className="divide-y divide-gray-50">
                     {myTickets.length === 0 ? (
                       <tr>
-                        <td colSpan={9} className="px-4 py-12 text-center">
+                        <td colSpan={8} className="px-4 py-12 text-center">
                           <div className="flex flex-col items-center gap-3">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"
                               strokeLinecap="round" strokeLinejoin="round"
@@ -189,14 +230,13 @@ export const StaffMyTickets = () => {
                           </div>
                         </td>
                       </tr>
-                    ) : myTickets.map(t => (
+                    ) : pagedTickets.map(t => (
                       <tr key={t.id} className="hover:bg-indigo-50/20 transition-colors">
                         <td className="px-4 py-3 font-mono font-medium" style={{ color: '#3c3c8c' }}>{t.id}</td>
                         <td className="px-4 py-3 max-w-[180px]">
                           <p className="truncate text-gray-800 font-medium">{t.title}</p>
                         </td>
                         <td className="px-4 py-3 text-gray-600">{t.category}</td>
-                        <td className="px-4 py-3 text-gray-500">{t.department ?? '—'}</td>
                         <td className="px-4 py-3"><PriorityBadge priority={t.priority} /></td>
                         <td className="px-4 py-3"><StatusBadge   status={t.status}   /></td>
                         <td className="px-4 py-3 text-gray-500">
