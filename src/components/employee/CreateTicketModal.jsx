@@ -3,7 +3,7 @@ import Modal from '../shared/Modal';
 import { DEPARTMENTS_MAP, DEPARTMENT_NAMES, PRIORITIES } from '../../data/mockData';
 import { getPriority } from '../../services/incidentService';
 
-const INITIAL = { title: '', department: '', category: '', priority: 'Medium', description: '' };
+const INITIAL = { title: '', department: '', category: '', priority: '', description: '' };
 
 const Field = ({ label, error, children }) => (
   <div>
@@ -80,6 +80,7 @@ const CreateTicketModal = ({ isOpen, onClose, onSubmit }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ description: form.description }),
       });
+      console.log(response);
       const result = await response.json();
       form.priority = result.priority;
       console.log(form);
