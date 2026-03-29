@@ -173,4 +173,4 @@ export const getIncidentStatsByUser=()=>
   get('/incidents/userStats')
 
 export const getPriority = (data) => 
-  post('https://iimp-backend.duckdns.org/predict', {description: data})
+  post('/predict', {description: data})
