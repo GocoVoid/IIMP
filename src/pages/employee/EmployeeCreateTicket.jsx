@@ -3,7 +3,6 @@ import DashboardLayout from '../../components/layout/DashboardLayout';
 import { useAuthContext } from '../../context/AuthContext';
 import { useTickets } from '../../hooks/useTickets';
 import { useNavigate } from 'react-router-dom';
-import { uploadAttachment } from '../../services/incidentService';
 import { DEPARTMENTS_MAP, DEPARTMENT_NAMES, PRIORITIES } from '../../data/mockData';
 
 const INITIAL = { title: '', department: '', category: '', priority: '', description: '' };
