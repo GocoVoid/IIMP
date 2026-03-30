@@ -17,7 +17,8 @@ const formatDate = (iso) => {
 
 /* ── Update Status Panel ────────────────────────────────── */
 export const UpdateStatusPanel = ({ ticket, onUpdateStatus }) => {
-  const [note,    setNote]    = useState('');
+  const [note,    
+    setNote]    = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
 

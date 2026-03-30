@@ -63,6 +63,9 @@ export const createIncident = (data) =>
     category:    data.category,
   });
 
+export const uploadFiles = (id, formData) => 
+  post(`/incidents/${id}/uploadAttachments`, { formData })
+
 /**
  * PATCH /incidents/:incidentKey/status
  * Body: { status }   — "Open" | "In Progress" | "Resolved" | "Closed"
@@ -120,7 +123,7 @@ export const recategorizeIncident = (incidentKey, categoryId) =>
 export const getComments = (incidentKey) =>
   get(`/incidents/getComments/${incidentKey}`);
 
-export const addComment = (incidentKey, commentText, internal = false) =>
+export const addComment = (incidentKey, commentText, internal=false) =>
   post(`/incidents/addComments/${incidentKey}`, { commentText, internal });
 
 /* ══════════════════════════════════════════════════════════

@@ -41,7 +41,7 @@ const CreateTicketModal = ({ isOpen, onClose, onSubmit }) => {
     if (form.title.length > 150)                      e.title       = 'Title must be under 150 characters.';
     if (!form.department)                             e.department  = 'Please select a department.';
     if (!form.category)                               e.category    = 'Please select a category.';
-    if (form.description.trim().length < 20)          e.description = 'Description must be at least 20 characters.';
+    if (form.description.trim().length < 40)          e.description = 'Description must be at least 40 characters.';
     return e;
   };
 
@@ -93,7 +93,24 @@ const CreateTicketModal = ({ isOpen, onClose, onSubmit }) => {
   
       const finalForm = { ...form, priority: fetchedPriority };
       console.log(finalForm);
-      createIncident({ ...finalForm, attachments: files });        // ✅ runs after priority is ready
+      const creationResponse = await createIncident({ ...finalForm}); 
+      console.log(creationResponse);
+      try {
+        const formData = new FormData();
+    
+        files.forEach((file) => {
+          formData.append("file", file);
+        });
+
+        const response = await uploadFiles(creationResponse.id, formData);
+        const data = await response.json();
+        console.log("Uploaded:", data);
+    
+      } catch (err) {
+        console.error(err);
+      }
+      
+      // ✅ runs after priority is ready
       setForm({ title: '', department: '', category: '', priority: '', description: '' });
       setFiles([]);
       setErrors({});
@@ -168,9 +185,9 @@ const CreateTicketModal = ({ isOpen, onClose, onSubmit }) => {
 
         <Field label="Description *" error={errors.description}>
           <textarea name="description" value={form.description} onChange={handleChange}
-            rows={4} placeholder="Describe the issue in detail (minimum 20 characters)"
+            rows={4} placeholder="Describe the issue in detail (minimum 40 characters)"
             className={`${inputCls(errors.description)} resize-none`} />
-          <p className="mt-1 text-[10px] text-gray-400">{form.description.trim().length} / 20 min</p>
+          <p className="mt-1 text-[10px] text-gray-400">{form.description.trim().length} / 40 min</p>
         </Field>
 
         <div>

@@ -7,6 +7,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import * as api from '../services/incidentService';
 
+import * as support_api from '../services/supportService';
+
 export const useTickets = (_currentUserId, _role) => {
   const [tickets,  setTickets]  = useState([]);
   const [stats,    setStats]    = useState({ total: 0, open: 0, inProgress: 0, resolved: 0, closed: 0, breached: 0 });
@@ -154,6 +156,20 @@ export const useTickets = (_currentUserId, _role) => {
     }));
   }, []);
 
+  const updateStatusWithNote = useCallback(async (incidentKey, newStatus, resolutionNote = '') => {
+    await support_api.updateIncidentStatusWithNote(incidentKey, resolutionNote);
+    setTickets(prev => prev.map(t => {
+      if (t.id !== incidentKey) return t;
+      const now = new Date().toISOString();
+      return {
+        ...t, status: newStatus, updatedAt: now,
+        resolutionNote: resolutionNote || t.resolutionNote,
+        resolvedAt: newStatus === 'Resolved' ? now : t.resolvedAt,
+        closedAt:   newStatus === 'Closed'   ? now : t.closedAt,
+      };
+    }));
+  }, []);
+
   const assignTicket = useCallback(async (incidentKey, assignedToUserId, category) => {
     await api.assignIncident(incidentKey, assignedToUserId, category);
     setTickets(prev => prev.map(t =>
@@ -164,6 +180,7 @@ export const useTickets = (_currentUserId, _role) => {
   }, []);
 
   const addComment = useCallback(async (incidentKey, text, _authorName, internal) => {
+    console.log(internal);
     const res = await api.addComment(incidentKey, text, internal)
     const newComment = {
       id:         res.id,

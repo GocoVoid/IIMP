@@ -8,3 +8,6 @@ export const getSupportStats = () =>
 
 export const getUnreadNotifications = () =>
   get('/support/getUnreadNotifications');
+
+export const updateIncidentStatusWithNote = (incidentKey, resolutionNote = '') =>
+  api.patch(`/incidents/${incidentKey}/status`, { incidentKey: incidentKey, resolutionNote: resolutionNote });

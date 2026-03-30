@@ -22,8 +22,8 @@ const SupportQueue = () => {
   /* ✅ Fetch on mount */
   useEffect(() => { fetchAll(); }, []);
 
-  const handleUpdateStatus = async (ticketId, newStatus) => {
-    await updateStatus(ticketId, newStatus);
+  const handleUpdateStatus = async (ticketId, newStatus, note) => {
+    await updateStatus(ticketId, newStatus, note);
     setSelected(prev => prev?.id === ticketId ? { ...prev, status: newStatus } : prev);
   };
 
@@ -130,11 +130,11 @@ const SupportQueue = () => {
                 </div>
 
                 <UpdateStatusPanel ticket={selected} onUpdateStatus={handleUpdateStatus} />
-                <CommentAttachmentPanel
+                {/* <CommentAttachmentPanel
                   ticket={selected}
                   onAddComment={handleAddComment}
                   authorName={user?.fullName}
-                />
+                /> */}
               </>
             ) : (
               <div className="h-72 flex items-center justify-center bg-white rounded-2xl
