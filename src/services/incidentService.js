@@ -135,11 +135,11 @@ export const addComment = (incidentKey, commentText, internal=false) =>
  * Body: FormData with field `file` (one file per call)
  * Server stores: fileName, fileUrl, fileSize, contentType, uploadedBy (JWT), createdAt
  */
-export const uploadAttachment = (incidentKey, file) => {
-  const fd = new FormData();
-  fd.append('file', file);
-  return post(`/incidents/${incidentKey}/attachments`, fd);
-};
+// export const uploadAttachment = (incidentKey, file) => {
+//   const fd = new FormData();
+//   fd.append('file', file);
+//   return post(`/incidents/${incidentKey}/attachments`, fd);
+// };
 
 /**
  * DELETE /incidents/:incidentKey/attachments/:attachmentId
